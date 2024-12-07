@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B Game</title>
+</head>
+<body>
+    <h1>113306002_HW6_1A2B</h1>
+    
+    <input type="text" id="inputField" maxlength="4" placeholder="請輸入 4 個不重複的數字">
+    <button onclick="submitGuess()">猜!</button>
+    <div class="log" id="log"></div>
+
+    <script>
+        let answer = generateAnswer();
+        let count = 0;
+
+        function generateAnswer() {
+            let digits = [];
+            for (let i = 0; i < 10; i++) {
+                digits.push(i.toString());
+            }
+
+            let result = [];
+            while (result.length < 4) {
+                let randomIndex = Math.floor(Math.random() * digits.length);
+                result.push(digits[randomIndex]);
+                digits.splice(randomIndex, 1);
+            }
+
+            return result.join('');
+        }
+
+        function submitGuess() {
+            const inputField = document.getElementById('inputField');
+            let guess = inputField.value;
+            if (!isValidGuess(guess)) {
+                alert("請輸入 4 個不重複的數字！");
+                return;
+            }
+
+            count++;
+            let feedback = checkAnswer(guess, answer);
+            logAttempt(guess, feedback);
+
+            if (feedback === "4A0B") {
+                alert("恭喜猜對了！共用了" +count+ "次嘗試。");
+                resetGame();
+            }
+
+            inputField.value = "";
+        }
+
+        function isValidGuess(guess) {
+            if (guess.length !== 4) {
+                return false;
+            }
+            const digits = guess.split('');
+            for (let digit of digits) {
+                if (digit < '0' || digit > '9') {
+                    return false; 
+                }
+            }
+            return new Set(digits).size === 4; 
+        }
+
+        function checkAnswer(guess, answer) {
+            let A = 0, B = 0;
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === answer[i]) {
+                    A++;
+                } else if (answer.includes(guess[i])) {
+                    B++;
+                }
+            }
+            return `${A}A${B}B`;
+        }
+
+        function logAttempt(guess, feedback) {
+            const logDiv = document.getElementById('log');
+            let attemptLog = document.createElement('p');
+            attemptLog.textContent = `第 ${count} 次: ${guess} → ${feedback}`;
+            logDiv.appendChild(attemptLog);
+        }
+
+        function resetGame() {
+            answer = generateAnswer();
+            count = 0;
+            document.getElementById('log').innerHTML = ""; 
+        }
+    </script>
+</body>
+</html>
+
